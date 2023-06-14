@@ -1,0 +1,94 @@
+library(ggplot2)
+library(tibble)
+
+sample_data <- function(seed = NULL, n = 100){
+    if(!is.null(seed)) set.seed(seed)
+    dat <- tibble(
+        x0 = runif(n, max = 0.8),
+        y0 = runif(n, max = 0.8),
+        x1 = x0 + runif(n, min = -.2, max = .2),
+        y1 = y0 + runif(n, min = -.2, max = .2),
+        shade = runif(n),
+        size = runif(n, max = 0.8),
+        shape = factor(sample(0:22, size = n, replace = TRUE)),
+        stem = runif(n, max = 1.5),
+        leafx = runif(n, min = 0.45, max = 0.5),
+        leafy = runif(n, min = 1.1, max = 1.2),
+        leafsize = runif(n, max = 0.3),
+    )
+}
+
+polar_styled_plot <- function(data = NULL, palette) {
+    ggplot(
+        data = data,
+        mapping = aes(
+            x = x0,
+            y = y0,
+            xend = x1,
+            yend = y1,
+            colour = shade,
+            size = size
+        )) +
+        coord_polar(clip = "off") +
+        geom_line(aes(x = 0.5, y = stem, color = 1)) +
+        geom_segment(aes(x = 0.45, xend = 0.5, y = 1.1, yend = 1.2, color = 1)) +
+        geom_segment(aes(x = 0.5, xend = 0.56, y = 1.15, yend = 1.20, color = 1)) +
+        #geom_point(aes(x = leafx, y = leafy, size = leafsize, color = 1)) +
+        #geom_point(aes(x = leafx + 0.05, y = leafy + 0.05, size = leafsize, color = 1)) +
+        scale_y_continuous(
+            expand = c(0, 0),
+            limits = c(0, 1),
+            oob = scales::oob_keep
+        ) +
+        scale_x_continuous(
+            expand = c(0, 0),
+            limits = c(0, 1),
+            oob = scales::oob_keep
+        ) +
+        scale_colour_gradientn(colours = palette) +
+        scale_size(range = c(0, 10)) +
+        theme_void() +
+        theme(plot.background = element_rect(fill = "#A4D3EE", color = "#A4D3EE")) +
+        guides(
+            colour = guide_none(),
+            size = guide_none(),
+            fill = guide_none(),
+            shape = guide_none()
+        )
+}
+
+
+dat <- sample_data(n = 500, seed = 2478)
+pal <- c("#FFDAB9", "#FF00AA", "#FEE5AC", "#FAFAD2", "#ffc8dd",
+         "#ffafcc", "#FFE4E1", "#FCFFF0", "#668014")
+
+polar_styled_plot(data = dat, palette = pal) + geom_segment()
+
+
+
+
+
+
+library(aRtsy)
+
+set.seed(3450)
+artwork
+canvas_stripes(
+    colors = c("black", "#333333","#72587F", "#71637D", "#A9ACB6","white"),
+    n = 300,
+    H = 0.05,
+    burnin = 1
+)
+saveCanvas(artwork, filename = "myArtwork.png") + canvas_planet(colors = c("black"))
+
+library(jasmines)
+library(tidyverse)
+
+use_seed(150) %>%
+    #entity_circle(grain = 300) %>%
+    scene_rows(n = 5, grain = 100, vertical = TRUE) %>%
+    unfold_warp(iterations = 1, scale = 0.5) %>%
+    style_ribbon(palette = palette_manual(c("#204829", "#22b455", "#80ce87", "#92e5a1")),
+                 alpha = c(0.5,.1),
+                 background = "#020204")
+
